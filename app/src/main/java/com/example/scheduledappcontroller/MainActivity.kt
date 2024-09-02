@@ -47,7 +47,7 @@ fun MainScreen() {
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF2196F3),
+                    containerColor = Color(0xFF4459E4),
                     titleContentColor = Color.White
                 )
             )
