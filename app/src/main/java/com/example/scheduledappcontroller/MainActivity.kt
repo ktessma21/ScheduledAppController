@@ -15,6 +15,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.scheduledappcontroller.ui.theme.ScheduledAppControllerTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,15 +26,24 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ScheduledAppControllerTheme {
-                MainScreen()
+                MainApp()
             }
         }
     }
 }
 
+@Composable
+fun MainApp() {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "main_screen") {
+        composable("main_screen") { MainScreen(navController) }
+        composable("disable_mode_screen") { DisableModeScreen() }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -62,13 +75,16 @@ fun MainScreen() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Calendar Placeholder
-                Text(text = "Calendar View", fontSize = 20.sp)
+                Text(text = "List of Labeled Modes", fontSize = 20.sp)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Repeat Disable Button
+                // Add Spacer with weight to push the button to the bottom
+                Spacer(modifier = Modifier.weight(1f))
+
+                // Add Disable Button
                 Button(
-                    onClick = { /* Handle repeat disable */ },
+                    onClick = { navController.navigate("disable_mode_screen") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
@@ -77,7 +93,7 @@ fun MainScreen() {
                         contentColor = Color.White
                     )
                 ) {
-                    Text(text = "Repeat Disable")
+                    Text(text = "Add Disable")
                 }
             }
         }
@@ -88,6 +104,6 @@ fun MainScreen() {
 @Composable
 fun MainScreenPreview() {
     ScheduledAppControllerTheme {
-        MainScreen()
+        MainScreen(rememberNavController()) // Pass a NavController for preview
     }
 }
