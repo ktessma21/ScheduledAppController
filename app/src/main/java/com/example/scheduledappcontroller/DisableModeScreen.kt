@@ -216,22 +216,6 @@ fun DisableModeScreen() {
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-
-                // Search bar for filtering apps
-                TextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    placeholder = { Text("Search Apps") },
-                    leadingIcon = {
-                        Icon(imageVector = Icons.Filled.Search, contentDescription = "Search Icon")
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    textStyle = LocalTextStyle.current.copy(fontSize = 14.sp)
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
                 // Scrollable list of installed apps with toggle switches
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
@@ -277,7 +261,9 @@ data class AppInfo(
     val name: String,
     val packageName: String,
     val icon: Bitmap
-)
+) : Comparable<AppInfo>{
+    override fun compareTo(other : AppInfo): Int = this.name.compareTo(other.name)
+}
 
 fun getInstalledApps(context: Context): List<AppInfo> {
     val pm: PackageManager = context.packageManager
@@ -294,6 +280,7 @@ fun getInstalledApps(context: Context): List<AppInfo> {
             apps.add(AppInfo(name, packageName, icon))
         }
     }
+    apps.sort() // Sort the applications by their names.
     return apps
 }
 
@@ -301,17 +288,32 @@ fun getInstalledApps(context: Context): List<AppInfo> {
 fun isRelevantApp(packageName: String): Boolean {
     // Known package names for social media, messaging, and games
     val relevantPackages = listOf(
-        // Social Media
-        "com.facebook.katana", "com.instagram.android", "com.twitter.android",
-        "com.snapchat.android", "com.tiktok.android",
+       "com.instagram.android", "com.zhiliaoapp.musically", "com.facebook.katana",
+    "com.snapchat.android", "com.twitter.android", "com.pinterest", "com.reddit.frontpage",
+    "com.linkedin.android", "com.tumblr",
 
-        // Messaging
-        "com.whatsapp", "com.facebook.orca", "com.google.android.apps.messaging",
-        "com.skype.raider", "com.signal.android",
+    // Messaging
+    "com.whatsapp", "com.facebook.orca", "org.telegram.messenger",
+    "com.viber.voip", "com.discord", "us.zoom.videomeetings",
 
-        // Games (this list can be expanded with known game package names)
-        "com.supercell.clashofclans", "com.king.candycrushsaga", "com.nianticlabs.pokemongo"
+    // Streaming and Video
+    "com.google.android.youtube", "com.netflix.mediaclient", "tv.twitch.android.app",
+    "com.spotify.music",
+
+    // Games
+    "com.king.candycrushsaga", "com.supercell.clashofclans", "com.tencent.ig",
+    "com.activision.callofduty.shooter",
+
+    // Shopping
+    "com.amazon.mShop.android.shopping", "com.ebay.mobile",
+
+    // Others
+    "com.google.android.gm", "com.android.chrome", "com.tinder",
+    "com.bumble.app", "com.niksoftware.snapseed"
+
+
     )
 
     return relevantPackages.any { packageName.startsWith(it) }
 }
+
