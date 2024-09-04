@@ -1,7 +1,7 @@
 package com.example.scheduledappcontroller
 
+import android.app.Activity
 import android.app.TimePickerDialog
-import android.content.pm.ApplicationInfo
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -11,8 +11,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.res.painterResource
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,7 +23,11 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,6 +37,8 @@ fun DisableModeScreen() {
     var startTime by remember { mutableStateOf("Start Time") }
     var endTime by remember { mutableStateOf("End Time") }
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
+    val selectedDays = remember { mutableStateListOf<String>() }
+    val toggledApps = remember { mutableStateListOf<String>() }
 
     val context = LocalContext.current
     val installedApps = getInstalledApps(context)
@@ -80,7 +84,24 @@ fun DisableModeScreen() {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Button(
-                            onClick = { /* Handle Save */ },
+                            onClick = {
+                                // Save data to DataStore
+                                val daysSet = selectedDays.toSet()
+                                val appsSet = toggledApps.toSet()
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    saveDisableModeData(
+                                        context,
+                                        scheduleName,
+                                        startTime,
+                                        endTime,
+                                        daysSet,
+                                        appsSet
+                                    )
+                                }
+
+                                // Navigate back to MainActivity
+                                (context as? Activity)?.finish()
+                            },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFF4CAF50),
                                 contentColor = Color.White
@@ -90,7 +111,10 @@ fun DisableModeScreen() {
                             Text("Save", fontSize = 14.sp)
                         }
                         Button(
-                            onClick = { /* Handle Cancel */ },
+                            onClick = {
+                                // Navigate back to MainActivity
+                                (context as? Activity)?.finish()
+                            },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFFF44336),
                                 contentColor = Color.White
@@ -221,7 +245,7 @@ fun DisableModeScreen() {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(filteredApps) { app ->
-                        AppItem(app = app)
+                        AppItem(app = app, toggledApps)
                         Divider(color = Color.Gray, thickness = 1.dp)
                     }
                 }
@@ -231,7 +255,7 @@ fun DisableModeScreen() {
 }
 
 @Composable
-fun AppItem(app: AppInfo) {
+fun AppItem(app: AppInfo, toggledApps: MutableList<String>) {
     var isEnabled by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
@@ -252,10 +276,15 @@ fun AppItem(app: AppInfo) {
         )
         Switch(
             checked = isEnabled,
-            onCheckedChange = { isEnabled = it }
+            onCheckedChange = {
+                isEnabled = it
+                if (isEnabled) toggledApps.add(app.packageName) else toggledApps.remove(app.packageName)
+            }
         )
     }
 }
+
+
 
 data class AppInfo(
     val name: String,

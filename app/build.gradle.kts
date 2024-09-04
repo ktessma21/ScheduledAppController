@@ -67,6 +67,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("androidx.navigation:navigation-compose:2.5.3")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 //    implementation("com.github.guness:jet-calendar:1.0.0") // Make sure this library is hosted on google() or mavenCentral()
 }
 
