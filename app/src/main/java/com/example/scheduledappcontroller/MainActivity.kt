@@ -15,10 +15,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.example.scheduledappcontroller.ui.theme.ScheduledAppControllerTheme
 
 class MainActivity : ComponentActivity() {
@@ -43,7 +43,7 @@ fun MainApp() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavController) {
+fun MainScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -74,15 +74,21 @@ fun MainScreen(navController: NavController) {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Calendar Placeholder
-                Text(text = "List of Labeled Modes", fontSize = 20.sp)
+                // Title
+                Text(text = "Choose a Mode", fontSize = 20.sp)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Add Spacer with weight to push the button to the bottom
+                // Mode Buttons
+                ModeButton(modeName = "Work", navController)
+                Spacer(modifier = Modifier.height(16.dp))
+                ModeButton(modeName = "School", navController)
+                Spacer(modifier = Modifier.height(16.dp))
+                ModeButton(modeName = "Gym", navController)
+
                 Spacer(modifier = Modifier.weight(1f))
 
-                // Add Disable Button
+                // Customize Mode Button
                 Button(
                     onClick = { navController.navigate("disable_mode_screen") },
                     modifier = Modifier
@@ -93,11 +99,27 @@ fun MainScreen(navController: NavController) {
                         contentColor = Color.White
                     )
                 ) {
-                    Text(text = "Add Disable")
+                    Text(text = "Customize Mode")
                 }
             }
         }
     )
+}
+
+@Composable
+fun ModeButton(modeName: String, navController: NavHostController) {
+    Button(
+        onClick = { /* Handle mode activation logic */ },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFFCCCCCC),
+            contentColor = Color.Black
+        )
+    ) {
+        Text(text = modeName, fontSize = 14.sp)
+    }
 }
 
 @Preview(showBackground = true)
